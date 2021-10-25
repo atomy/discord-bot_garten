@@ -22,6 +22,16 @@ if [ -z "${APP_NAME}" ] ; then
   exit 1
 fi
 
+if [ -z "${NATS_IP}" ] ; then
+  echo "ENV: NATS_IP is missing!"
+  exit 1
+fi
+
+if [ -z "${NATS_PORT}" ] ; then
+  echo "ENV: NATS_PORT is missing!"
+  exit 1
+fi
+
 if [ -z "${DISCORD_WEBHOOK_URL}" ] ; then
   echo "ENV: DISCORD_WEBHOOK_URL is missing!"
   exit 1
@@ -34,7 +44,9 @@ rm -f docker-compose.yml
 
 cp docker-compose.yml.dist docker-compose.yml
 sed -i "s|xxx.dkr.ecr.eu-central-1.amazonaws.com|${ECR_PREFIX}|" docker-compose.yml
-sed -i "s|yyy|${DISCORD_API_KEY}|" docker-compose.yml
+sed -i "s|bbbbbbb|${DISCORD_API_KEY}|" docker-compose.yml
+sed -i "s|192.168.2.20|${NATS_IP}|" docker-compose.yml
+sed -i "s|99999|${NATS_PORT}|" docker-compose.yml
 
 cp scripts/build.sh.dist scripts/build.sh
 sed -i "s|xxx.dkr.ecr.eu-central-1.amazonaws.com|${ECR_PREFIX}|" scripts/build.sh

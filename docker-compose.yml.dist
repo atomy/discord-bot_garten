@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  iot-bot:
+    image: xxx.dkr.ecr.eu-central-1.amazonaws.com/atomy/discord-bot_garten:latest
+    restart: always
+    environment:
+        DISCORD_API_KEY: 'bbbbbbb'
+        NATS_IP: '192.168.2.20'
+        NATS_PORT: 99999
