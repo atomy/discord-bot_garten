@@ -28,6 +28,7 @@ const natsPort = process.env.NATS_PORT
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`)
     setupNatsConnection()
+    setupDeadChecker()
 });
 
 setupNatsConnection = () => {
@@ -40,13 +41,12 @@ setupNatsConnection = () => {
     nc.subscribe('garden', (msg, reply, subject, sid) => {
         console.log('Received message: ' + msg)
         const message = JSON.parse(msg)
-        console.log('Received message: ' + msg)
         const currentUnixTimestamp = Math.floor(+new Date() / 1000);
 
         if (message.type === "sensor") {
             // only update every 60s
             if (currentUnixTimestamp - lastUpdate > 60) {
-                lastUpdate = currentUnixTimestamp
+                lastUpdate = currentUnixTimestamp;
                 let presenceMessage = util.format('T: %s - H: %s', message.temperature, message.humidity);
                 console.log('Setting activity: ' + presenceMessage);
                 client.user.setActivity(presenceMessage, {type: 'WATCHING'});
@@ -55,5 +55,23 @@ setupNatsConnection = () => {
     })
 }
 
-console.log("Connecting and login in...")
-client.login(discordApiKey)
+console.log("Connecting and login in...");
+client.login(discordApiKey);
+
+// check for dead queue
+const setupDeadChecker = function() {
+    console.log("[Dead-Queue-Check] Checking for dead queue...");
+    const currentUnixTimestamp = Math.floor(+new Date() / 1000);
+    console.log("[Dead-Queue-Check] Last update from queue was '" + (currentUnixTimestamp - lastUpdate) + "' seconds ago");
+
+    if ((currentUnixTimestamp - lastUpdate) > 300) {
+        console.log("[Dead-Queue-Check] Dead Queue detected!");
+        let presenceMessage = "?";
+        console.log('Setting activity: ' + presenceMessage);
+        client.user.setActivity(presenceMessage, {type: 'WATCHING'});
+    } else {
+        console.log("[Dead-Queue-Check] Queue seems to be alive!");
+    }
+
+    setTimeout(setupDeadChecker, 300000);
+};
