@@ -47,7 +47,8 @@ setupNatsConnection = () => {
             // only update every 60s
             if (currentUnixTimestamp - lastUpdate > 60) {
                 lastUpdate = currentUnixTimestamp;
-                let presenceMessage = util.format('T: %s - H: %s', message.temperature, message.humidity);
+
+                let presenceMessage = util.format('T: %s*C - H: %s\%', message.temperature, message.humidity);
                 console.log('Setting activity: ' + presenceMessage);
                 client.user.setActivity(presenceMessage, {type: 'WATCHING'});
             }
